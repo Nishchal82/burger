@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Burger Builder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        .form-container {
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin: auto;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .checkbox-container label {
+            margin: 0 0 0 10px;
+            font-weight: normal;
+        }
+        .button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        .summary-container {
+            margin-top: 30px;
+        }
+        .burger-summary {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .delete-button {
+            background: #FF5733;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .delete-button:hover {
+            background: #C70039;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <form id="burgerForm">
+        <label for="name">Your Name:</label>
+        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+
+        <label for="burgerType">Type of Burger:</label>
+        <select id="burgerType" name="burgerType" required>
+            <option value="">Select</option>
+            <option value="Veg">Veg</option>
+            <option value="Non-Veg">Non-Veg</option>
+        </select>
+
+        <label for="breadType">Type of Bread:</label>
+        <select id="breadType" name="breadType" required>
+            <option value="">Select</option>
+            <option value="Honey Oat">Honey Oat</option>
+            <option value="Wheat">Wheat</option>
+            <option value="Flatbread">Flatbread</option>
+        </select>
+
+        <label>Vegetables:</label>
+        <div class="checkbox-container"><input type="checkbox" name="vegetables" value="Bell Pepper"><label>Bell Pepper</label></div>
+        <div class="checkbox-container"><input type="checkbox" name="vegetables" value="Onion"><label>Onion</label></div>
+        <div class="checkbox-container"><input type="checkbox" name="vegetables" value="Jalapeno"><label>Jalapeno</label></div>
+        <div class="checkbox-container"><input type="checkbox" name="vegetables" value="Olives"><label>Olives</label></div>
+        <div class="checkbox-container"><input type="checkbox" name="vegetables" value="Lettuce"><label>Lettuce</label></div>
+        <div class="checkbox-container"><input type="checkbox" name="vegetables" value="Pickle"><label>Pickle</label></div>
+
+        <label for="cheeseType">Type of Cheese:</label>
+        <select id="cheeseType" name="cheeseType" required>
+            <option value="">Select</option>
+            <option value="American Cheese">American Cheese</option>
+            <option value="Cheddar Cheese">Cheddar Cheese</option>
+        </select>
+
+        <label for="sauceType">Type of Sauce:</label>
+        <select id="sauceType" name="sauceType" required>
+            <option value="">Select</option>
+            <option value="Mayonnaise">Mayonnaise</option>
+            <option value="Southwest">Southwest</option>
+            <option value="Mustard">Mustard</option>
+            <option value="Honey Mustard">Honey Mustard</option>
+        </select>
+
+        <button type="button" class="button" onclick="submitBurger()">Submit</button>
+    </form>
+</div>
+
+<div class="summary-container">
+    <h3>Burger Summary</h3>
+    <div id="burgerSummary"></div>
+</div>
+
+<script>
+// Function to handle form submission and display burger details
+function submitBurger() {
+    const formData = new FormData(document.getElementById('burgerForm'));
+    const data = Object.fromEntries(formData.entries());
+
+    // Check if the data is collected correctly
+    console.log(data); // Check form data in the console
+    
+    // Add vegetables to the data
+    const selectedVegetables = [];
+    document.querySelectorAll('input[name="vegetables"]:checked').forEach((checkbox) => {
+        selectedVegetables.push(checkbox.value);
+    });
+    data.vegetables = selectedVegetables.join(', ');
+
+    // Simulate saving data by storing it in localStorage for now
+    const burgerList = JSON.parse(localStorage.getItem('burgerList')) || [];
+    burgerList.push(data);
+    localStorage.setItem('burgerList', JSON.stringify(burgerList));
+
+    // Update burger summary on the page
+    loadBurgerSummary();
+}
+
+// Function to fetch and display burger summary from localStorage
+function loadBurgerSummary() {
+    const burgerList = JSON.parse(localStorage.getItem('burgerList')) || [];
+    const burgerSummaryContainer = document.getElementById('burgerSummary');
+    burgerSummaryContainer.innerHTML = '';  // Clear any existing burger summaries
+    
+    burgerList.forEach((burger, index) => {
+        const burgerSummary = document.createElement('div');
+        burgerSummary.classList.add('burger-summary');
+        burgerSummary.innerHTML = `
+            <div>
+                <strong>Name:</strong> ${burger.name} <br>
+                <strong>Burger Type:</strong> ${burger.burgerType} <br>
+                <strong>Bread Type:</strong> ${burger.breadType} <br>
+                <strong>Vegetables:</strong> ${burger.vegetables} <br>
+                <strong>Cheese Type:</strong> ${burger.cheeseType} <br>
+                <strong>Sauce Type:</strong> ${burger.sauceType} <br>
+            </div>
+            <button class="delete-button" onclick="deleteBurger(${index})">Delete</button>
+        `;
+        burgerSummaryContainer.appendChild(burgerSummary);
+    });
+}
+
+// Function to delete a burger from the summary
+function deleteBurger(index) {
+    const burgerList = JSON.parse(localStorage.getItem('burgerList')) || [];
+    burgerList.splice(index, 1);
+    localStorage.setItem('burgerList', JSON.stringify(burgerList));
+
+    // Reload the summary after deletion
+    loadBurgerSummary();
+}
+
+// Load burger summary on page load
+window.onload = loadBurgerSummary;
+</script>
+
+</body>
+</html>
